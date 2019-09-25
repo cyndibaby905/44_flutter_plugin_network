@@ -25,9 +25,14 @@ import okhttp3.Response;
 /** FlutterPluginNetworkPlugin */
 public class FlutterPluginNetworkPlugin implements MethodCallHandler {
   /** Plugin registration. */
+  private Registrar registrar;
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_plugin_network");
-    channel.setMethodCallHandler(new FlutterPluginNetworkPlugin());
+    channel.setMethodCallHandler(new FlutterPluginNetworkPlugin(registrar));
+  }
+
+  public FlutterPluginNetworkPlugin(Registrar registrar) {
+    this.registrar = registrar;
   }
 
   @Override
@@ -71,10 +76,24 @@ public class FlutterPluginNetworkPlugin implements MethodCallHandler {
       @Override
       public void onResponse(Call call, final Response response) throws IOException {
         if (!response.isSuccessful()) {
-          result.error("Error", "Unexpected code " + response, null);
+          final String content = "Unexpected code " + response;
+          registrar.activity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              result.error("Error", content, null);
+            }
+          });
 
         } else {
-          result.success(response.body().string());
+          final String content = response.body().string();
+          registrar.activity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              result.success(content);
+            }
+          });
+
+
         }
       }
     });
