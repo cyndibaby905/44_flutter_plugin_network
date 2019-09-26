@@ -1,5 +1,5 @@
 #import "FlutterPluginNetworkPlugin.h"
-#import <AFNetworking.h>
+#import "AFNetworking.h"
 
 @implementation FlutterPluginNetworkPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
